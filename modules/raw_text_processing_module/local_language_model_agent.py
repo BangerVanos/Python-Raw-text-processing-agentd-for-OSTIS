@@ -87,7 +87,7 @@ class LocalLLMTextProcessor(ScAgentClassic, IGetCleanText):
         
         # Check text for emptiness. If processed text is empty, that means that model does not work
         if clean_text is None or clean_text == '':
-            self.logger.error(f'Error: Looks like that model {cf.NON_OFFICIAL_API_DEFAULT_MODEL} does not work. Try to change one in configs.')
+            self.logger.error(f'Error: local LLM does not work. Try to change it or use other processing method.')
             return ScResult.ERROR
 
         # Creating answer and finishing agent work
