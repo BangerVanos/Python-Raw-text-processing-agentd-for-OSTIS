@@ -5,7 +5,9 @@ by changing NON_OFFICIAL_API_DEFAULT_MODEL parameter"""
 
 import g4f
 from sc_client.constants.common import ScEventType
+from sc_client.constants import sc_types
 from sc_client.models import ScAddr, ScLinkContentType, ScTemplate
+from sc_client.client import template_search
 
 from sc_kpm.identifiers import QuestionStatus
 from sc_kpm.sc_keynodes import Idtf
@@ -17,7 +19,8 @@ from sc_kpm.utils.action_utils import (
 )
 from sc_kpm.utils import (
     get_link_content_data,
-    create_link
+    create_link,
+    get_system_idtf,
 )
 from sc_kpm import ScAgentClassic
 
@@ -37,22 +40,51 @@ class NonOfficialAPITextProcessor(ScAgentClassic, IGetCleanText):
         super().__init__(cf.NON_OFFICIAL_API_AGENT_ACTION)               
 
     def on_event(self, event_element: ScAddr, event_edge: ScAddr, action_element: ScAddr) -> ScResult:                       
-        self.logger.info('Non-official API raw text processor began to run...')        
+        self.logger.info('Non-official API raw text processor began to run...')
+
+        # Get sc-link with raw text        
         raw_text_node = get_action_arguments(action_element, 1)[0]
         if not raw_text_node:
             self.logger.error('Error: could not find raw text sc-link to process')
             return ScResult.ERROR_INVALID_PARAMS
-        raw_text = get_link_content_data(raw_text_node)
+        
+        #Get language of raw text sc-link
+        language_template = ScTemplate()
+        language_template.triple(
+            sc_types.NODE_CLASS,
+            sc_types.EDGE_ACCESS_VAR_POS_PERM,
+            raw_text_node
+        )
+        search_result = template_search(language_template)
+        if len(search_result) != 1:
+            self.logger.error('Error: You have passed no language or too many arguments.')
+            return ScResult.ERROR_INVALID_PARAMS
+        language_node = search_result[0][0]
+        language = get_system_idtf(language_node)
+        if not language in cf.AVAILABLE_LANGUAGES:
+            self.logger.error(f'Error: you have not passed available language as argument. You passed: {language}')
+            return ScResult.ERROR_INVALID_PARAMS
+        
+        # Get raw text string
+        raw_text = get_link_content_data(raw_text_node)        
         if not isinstance(raw_text, str):
-            self.logger.error(f'Error: your raw text must be string type, but text of yours is {type(raw_text)}')
+            self.logger.error(f'Error: your raw text link must be string type, but text of yours is {type(raw_text)}')
             return ScResult.ERROR_INVALID_TYPE
+
+        # Trying to get clean text        
         try:
-            clean_text = self._get_clean_text(raw_text, 'lang_en')
-            answer_link = create_link(clean_text, ScLinkContentType.STRING)
+            clean_text = self._get_clean_text(raw_text, language)            
         except HTTPError as err:
             self.logger.error(f'Error: {err}.\nThis error is on non-official API\'s side.')
             return ScResult.ERROR
-        print(clean_text)
+        
+        # Check text for emptiness. If processed text is empty, that means that model does not work
+        if clean_text is None or clean_text == '':
+            self.logger.error(f'Error: Looks like that model {cf.NON_OFFICIAL_API_DEFAULT_MODEL} does not work. Try to change one in configs.')
+            return ScResult.ERROR
+
+        # Creating answer and finishing agent work
+        answer_link = create_link(clean_text, ScLinkContentType.STRING)        
         create_action_answer(action_element, answer_link)
         self.logger.info('Successfully processed the text using non-official API! Wery well!')
         finish_action_with_status(action_element, True)
@@ -70,5 +102,5 @@ class NonOfficialAPITextProcessor(ScAgentClassic, IGetCleanText):
             messages=messages,
             temperature=0
         )
-        self.logger.info(f'Successfully cleaned text for you\n:{response}')
-        return response    
+        self.logger.info(f'Successfully cleaned text for you\n: {response}')
+        return response        
