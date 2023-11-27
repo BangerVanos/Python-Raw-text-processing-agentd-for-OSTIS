@@ -4,12 +4,10 @@ by changing NON_OFFICIAL_API_DEFAULT_MODEL parameter"""
 
 
 import g4f
-from sc_client.constants.common import ScEventType
 from sc_client.constants import sc_types
 from sc_client.models import ScAddr, ScLinkContentType, ScTemplate
 from sc_client.client import template_search
 
-from sc_kpm.identifiers import QuestionStatus
 from sc_kpm.sc_keynodes import Idtf
 from sc_kpm.sc_result import ScResult
 from sc_kpm.utils.action_utils import (

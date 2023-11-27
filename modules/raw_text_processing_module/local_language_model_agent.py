@@ -4,12 +4,10 @@ Better make server which will contain and maintain that model as you need powerf
 GPU to run it locally."""
 
 
-from sc_client.constants.common import ScEventType
 from sc_client.constants import sc_types
 from sc_client.models import ScAddr, ScLinkContentType, ScTemplate
 from sc_client.client import template_search
 
-from sc_kpm.identifiers import QuestionStatus
 from sc_kpm.sc_keynodes import Idtf
 from sc_kpm.sc_result import ScResult
 from sc_kpm.utils.action_utils import (
@@ -26,7 +24,6 @@ from sc_kpm import ScAgentClassic
 
 from . import raw_text_processing_configs as cf
 from .interfaces import IGetCleanText
-from requests import HTTPError
 import logging
 
 import transformers

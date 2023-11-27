@@ -22,5 +22,4 @@ LOCAL_MODEL_AGENT_ACTION = 'action_get_clean_text_using_local_model'
 
 # Configs for official API agent
 OPENAI_TOKEN = 'PUT_YOUR_OPEN_AI_TOKEN_HERE'
-BARD_TOKEN = 'PUT_YOUR_BARD_TOKEN_HERE'
 OFFICIAL_API_AGENT_ACTION = 'action_get_clean_text_using_official_api'
