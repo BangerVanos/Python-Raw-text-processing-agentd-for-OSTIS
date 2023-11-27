@@ -93,7 +93,7 @@ class LocalLLMTextProcessor(ScAgentClassic, IGetCleanText):
         # Creating answer and finishing agent work
         answer_link = create_link(clean_text, ScLinkContentType.STRING)        
         create_action_answer(action_element, answer_link)
-        self.logger.info('Successfully processed the text using non-official API! Wery well!')
+        self.logger.info('Successfully processed the text using local LLM.')
         finish_action_with_status(action_element, True)
         return ScResult.OK
     

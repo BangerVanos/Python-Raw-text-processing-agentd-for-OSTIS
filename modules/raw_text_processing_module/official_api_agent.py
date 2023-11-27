@@ -1,6 +1,7 @@
-"""This is agent which uses non-official API
-of LLMs. You can choose used model in configs
-by changing NON_OFFICIAL_API_DEFAULT_MODEL parameter"""
+"""This is agent which uses official API
+of ChatGPT. You can choose used model in configs
+by changing OPENAI_MODEL parameter. Maybe some more
+LLM's support will be added in future."""
 
 
 import openai
@@ -74,17 +75,12 @@ class OfficialAPITextProcessor(ScAgentClassic, IGetCleanText):
             clean_text = self._get_clean_text(raw_text, language)            
         except Exception as err:
             self.logger.error(f'Error: {err}.\nThis error is on official API\'s side.')
-            return ScResult.ERROR
-        
-        # Check text for emptiness. If processed text is empty, that means that model does not work
-        if clean_text is None or clean_text == '':
-            self.logger.error(f'Error: Looks like that model {cf.NON_OFFICIAL_API_DEFAULT_MODEL} does not work. Try to change one in configs.')
-            return ScResult.ERROR
+            return ScResult.ERROR        
 
         # Creating answer and finishing agent work
         answer_link = create_link(clean_text, ScLinkContentType.STRING)        
         create_action_answer(action_element, answer_link)
-        self.logger.info('Successfully processed the text using non-official API! Wery well!')
+        self.logger.info('Successfully processed the text using official API! Wery well!')
         finish_action_with_status(action_element, True)
         return ScResult.OK
     
