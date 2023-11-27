@@ -1,6 +1,7 @@
-"""This is agent which uses local LLM
-which is located on your computer/server. You can choose used model in configs
-by changing LOCAL_MODEL_PATH parameter"""
+"""This is agent which uses local LLM which is located on your computer/server.
+You can choose used model in configs by changing LOCAL_MODEL_PATH parameter.
+Better make server which will contain and maintain that model as you need powerful
+GPU to run it locally."""
 
 
 from sc_client.constants.common import ScEventType
@@ -102,8 +103,8 @@ class LocalLLMTextProcessor(ScAgentClassic, IGetCleanText):
     def _get_clean_text(self, raw_text: str, language: str) -> str:
         """Method applies raw text describing structure from KB and language, which is string
         containing text like lang_YOUR_LANGUAGE_CODE (which is different representation for languages in
-        OSTIS KBs). For example, english language will be lang_en. For text processing non-official
-        LLM api is used. You can configure used model in raw_text_processing_configs file"""
+        OSTIS KBs). For example, english language will be lang_en. For text processing local LLM
+        is used. You can configure used model in raw_text_processing_configs file"""
         
         system_input = cf.PROMPTS[language].format('').replace("\'", '')
         prompt = f"### System:\n{system_input}\n### User:\n{raw_text}\n### Assistant:\n"
