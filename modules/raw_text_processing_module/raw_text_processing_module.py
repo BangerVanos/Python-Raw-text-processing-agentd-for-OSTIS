@@ -14,8 +14,9 @@ ones you can download, faster as LLMs providers have access to fastest GPUs.
 
 from sc_kpm import ScModule
 from .non_official_api_agent import NonOfficialAPITextProcessor
+from .official_api_agent import OfficialAPITextProcessor
 
 
 class RawTextProcessingModule(ScModule):
     def __init__(self) -> None:
-        super().__init__(NonOfficialAPITextProcessor())
+        super().__init__(NonOfficialAPITextProcessor(), OfficialAPITextProcessor())

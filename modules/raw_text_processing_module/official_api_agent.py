@@ -4,7 +4,7 @@ by changing OPENAI_MODEL parameter. Maybe some more
 LLM's support will be added in future."""
 
 
-import openai
+from openai import OpenAI
 from sc_client.constants import sc_types
 from sc_client.models import ScAddr, ScLinkContentType, ScTemplate
 from sc_client.client import template_search
@@ -91,13 +91,15 @@ class OfficialAPITextProcessor(ScAgentClassic, IGetCleanText):
         LLM api is used. You can configure used model in raw_text_processing_configs file"""
 
         # Request for clean text from Open-AI
-        openai.api_key = cf.OPENAI_TOKEN
+        client = OpenAI(
+            api_key=cf.OPENAI_TOKEN
+        )
         messages = [{'role': 'user', 'content': cf.PROMPTS[language].format(raw_text)}]
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=cf.OPENAI_DEFAULT_MODEL,
             messages=messages,
             temperature=0
         )
-        clean_text = response.choices[0].message['content']
+        clean_text = response.choices[0].message.content
         self.logger.info(f'Successfully cleaned text for you\n: {clean_text}')
         return clean_text      
